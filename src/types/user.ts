@@ -52,3 +52,11 @@ export async function validateUser(
     }
   }
 }
+
+export function isSameUser(userA: User, userB: User): boolean {
+  if (userA.id === userB.id) return true;
+  if (userA.age !== userB.age) return false;
+  if (userA.firstName !== userB.firstName) return false;
+  if (userA.lastName !== userB.lastName) return false;
+  return true;
+}
