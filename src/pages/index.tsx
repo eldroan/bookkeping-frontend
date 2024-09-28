@@ -44,6 +44,7 @@ export default function Home({
         <button>Add user</button>
       </div>
       {data && <UserTable users={data} loading={isLoading} />}
+      {!data && isLoading && <p>Loading...</p>}
     </div>
   );
 }
