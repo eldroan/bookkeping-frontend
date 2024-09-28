@@ -1,4 +1,4 @@
-import { InferType, mixed, number, object, string } from "yup";
+import { InferType, ValidationError, mixed, number, object, string } from "yup";
 import { Gender } from "./gender";
 
 const userSchema = object({
@@ -28,3 +28,27 @@ const userSchema = object({
 });
 
 export type User = InferType<typeof userSchema>;
+
+type ResultSuccess = {
+  result: "success";
+  user: User;
+};
+
+type ResultError = {
+  result: "error";
+  errors: string[];
+};
+
+export async function validateUser(
+  user: unknown
+): Promise<ResultSuccess | ResultError> {
+  try {
+    return { result: "success", user: await userSchema.validate(user) };
+  } catch (err) {
+    if (err instanceof ValidationError) {
+      return { result: "error", errors: err.errors };
+    } else {
+      return { result: "error", errors: ["Something went really wrong :s"] };
+    }
+  }
+}
