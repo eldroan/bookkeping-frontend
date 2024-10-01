@@ -14,9 +14,10 @@ import {
   PlusIcon,
   SymbolIcon,
 } from "@radix-ui/react-icons";
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import { getUrl } from "@/utils/geturl";
 import { UserDialog } from "@/components/UserDialog";
+import { UserDeleteDialog } from "@/components/UserDeleteDialog";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -125,11 +126,11 @@ export default function Home({
                         Edit
                       </Dialog.Trigger>
                     </UserDialog>
-                    <DeleteUserDialog>
+                    <UserDeleteDialog user={u}>
                       <Dialog.Trigger className="font-bold border-2 py-1 px-4 text-sm rounded-md">
                         Delete
                       </Dialog.Trigger>
-                    </DeleteUserDialog>
+                    </UserDeleteDialog>
                   </div>
                 </td>
               </tr>
@@ -144,21 +145,5 @@ export default function Home({
         <GitHubLogoIcon width={40} height={40} />
       </a>
     </div>
-  );
-}
-
-function DeleteUserDialog({ children }: { children: ReactNode }) {
-  return (
-    <Dialog.Root>
-      {children}
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 backdrop-blur-sm bg-black/10" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-8 shadow-lg rounded-lg">
-          {/* <div className="bg-white flex flex-col"> */}
-
-          <p>Delete user</p>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
   );
 }
