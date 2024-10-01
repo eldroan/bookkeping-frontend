@@ -18,6 +18,7 @@ import { useState } from "react";
 import { getUrl } from "@/utils/geturl";
 import { UserDialog } from "@/components/UserDialog";
 import { UserDeleteDialog } from "@/components/UserDeleteDialog";
+import { sortByProp } from "@/utils/sortByProp";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -38,9 +39,6 @@ export const getServerSideProps = (async () => {
 export default function Home({
   ssrUsers,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const columns = ["Gender", "First Name", "Last Name", "Age"];
-  const [sortBy, setSortBy] = useState({ key: columns[0], ascending: false });
-  // TODO: Add isLoading and general spinner for ssr data failure
   const { data: users, isFetching } = useQuery({
     queryKey: ["/api/users"],
     queryFn: () =>
@@ -48,11 +46,18 @@ export default function Home({
     initialData: ssrUsers,
   });
 
-  const handleSort = (key: string) => {
-    if (key == undefined) return;
+  const columns: { key: string; sortBy: (u: User) => string | number }[] = [
+    { key: "Gender", sortBy: (u) => u.gender },
+    { key: "First Name", sortBy: (u: User) => u.firstName },
+    { key: "Last Name", sortBy: (u: User) => u.lastName },
+    { key: "Age", sortBy: (u: User) => u.age },
+  ];
+  const [sortBy, setSortBy] = useState({ ...columns[0], ascending: false });
+  const handleSort = (key: string, sortBy: (u: User) => string | number) => {
     setSortBy((prevSortBy) => ({
       key,
       ascending: key === prevSortBy.key ? !prevSortBy.ascending : false,
+      sortBy,
     }));
   };
 
@@ -78,11 +83,11 @@ export default function Home({
         <table className="bg-white shadow-lg rounded-lg border-separate px-8 py-4 table-fixed">
           <thead>
             <tr>
-              {columns.map((wording) => (
+              {columns.map(({ key: wording, sortBy: fn }) => (
                 <th key={wording}>
                   <button
                     className="flex items-center gap-2 w-full text-left py-4"
-                    onClick={() => handleSort(wording)}
+                    onClick={() => handleSort(wording, fn)}
                   >
                     <p className="text-gray-400">{wording}</p>
                     {sortBy.key === wording && !sortBy.ascending && (
@@ -112,29 +117,31 @@ export default function Home({
             </tr>
           </thead>
           <tbody>
-            {users.map((u) => (
-              <tr key={u.id} className="hover:bg-gray-50 capitalize">
-                {/* TODO: This border has gaps between rows that look bad on hover */}
-                <td className="border-t py-5">{u.gender}</td>
-                <td className="border-t py-5">{u.firstName}</td>
-                <td className="border-t py-5">{u.lastName}</td>
-                <td className="border-t py-5">{u.age}</td>
-                <td className="border-t py-5">
-                  <div className="flex justify-end gap-2">
-                    <UserDialog user={u}>
-                      <Dialog.Trigger className="font-bold border-2 py-1 px-4 text-sm rounded-md">
-                        Edit
-                      </Dialog.Trigger>
-                    </UserDialog>
-                    <UserDeleteDialog user={u}>
-                      <Dialog.Trigger className="font-bold border-2 py-1 px-4 text-sm rounded-md">
-                        Delete
-                      </Dialog.Trigger>
-                    </UserDeleteDialog>
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {users
+              .toSorted(sortByProp(sortBy.sortBy, sortBy.ascending))
+              .map((u) => (
+                <tr key={u.id} className="hover:bg-gray-50 capitalize">
+                  {/* TODO: This border has gaps between rows that look bad on hover */}
+                  <td className="border-t py-5">{u.gender}</td>
+                  <td className="border-t py-5">{u.firstName}</td>
+                  <td className="border-t py-5">{u.lastName}</td>
+                  <td className="border-t py-5">{u.age}</td>
+                  <td className="border-t py-5">
+                    <div className="flex justify-end gap-2">
+                      <UserDialog user={u}>
+                        <Dialog.Trigger className="font-bold border-2 py-1 px-4 text-sm rounded-md">
+                          Edit
+                        </Dialog.Trigger>
+                      </UserDialog>
+                      <UserDeleteDialog user={u}>
+                        <Dialog.Trigger className="font-bold border-2 py-1 px-4 text-sm rounded-md">
+                          Delete
+                        </Dialog.Trigger>
+                      </UserDeleteDialog>
+                    </div>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       )}
