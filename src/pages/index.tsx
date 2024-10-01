@@ -2,18 +2,22 @@ import { User } from "@/types/user";
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import localFont from "next/font/local";
 import { users as initialUsers } from "./api/users";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import * as Dialog from "@radix-ui/react-dialog";
+import { useForm, SubmitHandler } from "react-hook-form";
 
 import {
   CaretDownIcon,
   CaretSortIcon,
   CaretUpIcon,
   PlusIcon,
+  SymbolIcon,
 } from "@radix-ui/react-icons";
-import { ReactNode, useState } from "react";
+import { FormEvent, ReactNode, useEffect, useState } from "react";
 import { getUrl } from "@/utils/geturl";
+import { Gender } from "@/types/gender";
+import { UserDialog } from "@/components/UserDialog";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -37,7 +41,7 @@ export default function Home({
   const columns = ["Gender", "First Name", "Last Name", "Age"];
   const [sortBy, setSortBy] = useState({ key: columns[0], ascending: false });
   // TODO: Add isLoading and general spinner for ssr data failure
-  const { data: users } = useQuery({
+  const { data: users, isFetching } = useQuery({
     queryKey: ["/api/users"],
     queryFn: () =>
       axios.get<User[]>(`${getUrl()}/api/users`).then((r) => r.data),
@@ -57,7 +61,12 @@ export default function Home({
       className={`${geistSans.variable} ${geistMono.variable} font-[family-name:var(--font-geist-sans)] flex flex-col p-8 gap-6 bg-background h-screen overflow-x-scroll`}
     >
       <div className="flex justify-between items-center">
-        <h1 className="font-medium text-4xl">Users</h1>
+        <h1 className="font-medium text-4xl flex gap-2 justify-center items-center">
+          Users{" "}
+          {isFetching && (
+            <SymbolIcon width="16" height="16" className="animate-spin" />
+          )}
+        </h1>
         <UserDialog>
           <Dialog.Trigger className="flex items-center bg-black text-white gap-2 py-3 px-4 rounded-full hover:shadow-xl focus:ring focus:ring-inset focus:ring-white">
             <PlusIcon width="16" height="16" />
@@ -130,26 +139,6 @@ export default function Home({
         </table>
       )}
     </div>
-  );
-}
-
-function UserDialog({ user, children }: { user?: User; children: ReactNode }) {
-  const title = user !== undefined ? "Edit user" : "Add user";
-  const cta = user !== undefined ? "Save" : "Add";
-  return (
-    <Dialog.Root>
-      {children}
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 backdrop-blur-sm bg-black/10" />
-        <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-8 shadow-lg rounded-lg">
-          {/* <div className="bg-white flex flex-col"> */}
-
-          <p>{title}</p>
-          <p>{cta}</p>
-          {/* </div> */}
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
   );
 }
 

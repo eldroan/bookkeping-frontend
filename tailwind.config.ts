@@ -10,6 +10,8 @@ const config: Config = {
     extend: {
       colors: {
         background: "#FAF9F2",
+        dialog_background: "#DFDDD3",
+        dialog_text: "#706D5C",
         foreground: "var(--foreground)",
       },
     },
