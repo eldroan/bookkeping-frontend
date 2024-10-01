@@ -1,11 +1,10 @@
 import { User } from "@/types/user";
 import type { InferGetServerSidePropsType, GetServerSideProps } from "next";
 import localFont from "next/font/local";
-import { users as initialUsers } from "./api/users";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { db } from "./api/users";
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import * as Dialog from "@radix-ui/react-dialog";
-import { useForm, SubmitHandler } from "react-hook-form";
 
 import {
   CaretDownIcon,
@@ -14,9 +13,8 @@ import {
   PlusIcon,
   SymbolIcon,
 } from "@radix-ui/react-icons";
-import { FormEvent, ReactNode, useEffect, useState } from "react";
+import { ReactNode, useState } from "react";
 import { getUrl } from "@/utils/geturl";
-import { Gender } from "@/types/gender";
 import { UserDialog } from "@/components/UserDialog";
 
 const geistSans = localFont({
@@ -32,7 +30,7 @@ const geistMono = localFont({
 
 export const getServerSideProps = (async () => {
   // Returning data since it in memory but probably should fetch api or consume a service
-  return { props: { ssrUsers: initialUsers } };
+  return { props: { ssrUsers: db.users } };
 }) satisfies GetServerSideProps<{ ssrUsers: User[] }>;
 
 export default function Home({

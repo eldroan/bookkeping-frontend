@@ -1,7 +1,7 @@
 import { InferType, ValidationError, mixed, number, object, string } from "yup";
 import { Gender } from "./gender";
 
-const userSchema = object({
+export const userSchema = object({
   id: string().uuid(),
   firstName: string()
     .required()
@@ -15,6 +15,7 @@ const userSchema = object({
     .required()
     .test((v) => Object.values(Gender).includes(v)),
   age: number()
+    .transform((value) => (Number.isNaN(value) ? null : value))
     .required()
     .positive()
     .when(["gender"], {
