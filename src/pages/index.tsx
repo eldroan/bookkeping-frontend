@@ -10,6 +10,7 @@ import {
   CaretDownIcon,
   CaretSortIcon,
   CaretUpIcon,
+  GitHubLogoIcon,
   PlusIcon,
   SymbolIcon,
 } from "@radix-ui/react-icons";
@@ -136,6 +137,12 @@ export default function Home({
           </tbody>
         </table>
       )}
+      <a
+        className="fixed right-0 bottom-0 mr-8 mb-8 rounded-full"
+        href="https://github.com/eldroan/bookkeping-frontend"
+      >
+        <GitHubLogoIcon width={40} height={40} />
+      </a>
     </div>
   );
 }
