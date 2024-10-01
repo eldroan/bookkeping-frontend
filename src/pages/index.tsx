@@ -14,7 +14,7 @@ import {
   PlusIcon,
   SymbolIcon,
 } from "@radix-ui/react-icons";
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import { getUrl } from "@/utils/geturl";
 import { UserDialog } from "@/components/UserDialog";
 import { UserDeleteDialog } from "@/components/UserDeleteDialog";

@@ -1,14 +1,10 @@
-import { User, userSchema } from "@/types/user";
+import { User } from "@/types/user";
 import { getUrl } from "@/utils/geturl";
-import { yupResolver } from "@hookform/resolvers/yup";
 import * as Dialog from "@radix-ui/react-dialog";
 import { SymbolIcon } from "@radix-ui/react-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { ReactNode, useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { UserInput } from "./UserInput";
-import { UserDropdown } from "./UserDropdown";
 
 export function UserDeleteDialog({
   user,
