@@ -2,7 +2,7 @@
 import { User, validateUser } from "@/types/user";
 import { Error } from "@/types/error";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { users } from ".";
+import { db } from ".";
 
 export default async function handler(
   req: NextApiRequest,
@@ -14,7 +14,7 @@ export default async function handler(
     return;
   }
   const id = req.query.id as string;
-  const user = users.find((u) => u.id === id);
+  const user = db.users.find((u) => u.id === id);
   if (!user) {
     res.status(404).json({ message: "user not found" });
     return;
@@ -24,8 +24,10 @@ export default async function handler(
   } else if (req.method == "PATCH") {
     const toUpdate = await validateUser({ ...user, ...req.body, id: user.id });
     if (toUpdate.result === "success") {
-      const idx = users.indexOf(user);
-      users[idx] = toUpdate.user;
+      db.users = db.users.map((u) =>
+        u.id === toUpdate.user.id ? { ...toUpdate.user, id: u.id } : u
+      );
+
       res.status(200).json(toUpdate.user);
     } else {
       res.status(400).json({
@@ -34,13 +36,7 @@ export default async function handler(
       });
     }
   } else if (req.method == "DELETE") {
-    const newUsers = users.filter((u) => u.id !== user.id);
-    // TODO: Find a less hacky way to do a mock remove
-    let removed;
-    do {
-      removed = users.pop();
-    } while (removed !== undefined);
-    newUsers.forEach((u) => users.push(u));
+    db.users = db.users.filter((u) => u.id !== user.id);
     res.status(204).end();
   } else {
     res.status(404).json({ message: "no such method" });
